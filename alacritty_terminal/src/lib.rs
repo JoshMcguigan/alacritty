@@ -35,6 +35,7 @@ mod cursor;
 pub mod display;
 pub mod event;
 pub mod event_loop;
+pub mod comm_loop;
 pub mod grid;
 pub mod index;
 pub mod input;

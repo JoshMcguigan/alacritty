@@ -42,6 +42,7 @@ use alacritty_terminal::clipboard::Clipboard;
 use alacritty_terminal::config::{Config, Monitor};
 use alacritty_terminal::display::Display;
 use alacritty_terminal::event_loop::{self, EventLoop, Msg};
+use alacritty_terminal::comm_loop::CommLoop;
 #[cfg(target_os = "macos")]
 use alacritty_terminal::locale;
 use alacritty_terminal::message_bar::MessageBuffer;
@@ -182,6 +183,8 @@ fn run(config: Config, message_buffer: MessageBuffer) -> Result<(), Box<dyn Erro
     let event_loop =
         EventLoop::new(Arc::clone(&terminal), display.notifier(), pty, config.debug.ref_test);
 
+    let comm_loop = CommLoop::new(Arc::clone(&terminal));
+
     // The event loop channel allows write requests from the event processor
     // to be sent to the loop and ultimately written to the pty.
     let loop_tx = event_loop.channel();
@@ -208,6 +211,8 @@ fn run(config: Config, message_buffer: MessageBuffer) -> Result<(), Box<dyn Erro
 
     // Kick off the I/O thread
     let _io_thread = event_loop.spawn(None);
+
+    comm_loop.spawn();
 
     info!("Initialisation complete");
 
